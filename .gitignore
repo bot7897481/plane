@@ -87,6 +87,7 @@ tmp/
 
 ## packages
 dist
+!deployments/aio/community/dist
 .temp/
 deploy/selfhost/plane-app/
 
