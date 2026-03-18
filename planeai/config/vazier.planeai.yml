@@ -1,0 +1,46 @@
+# .planeai.yml for Vazier AI
+# Drop at the root of your Vazier AI repo as: .planeai.yml
+
+name: Vazier
+
+tech_stack: >
+  TypeScript + Node.js. The original Vazier AI source code.
+  Contains: src/agent.ts (agent loop), src/skills/ (skills system),
+  src/tools/code-agent/ (code generation orchestrator),
+  src/mcp-servers/ (Gmail, Calendar, Drive integrations),
+  src/channels/ (Telegram, Slack, Discord bots).
+  This codebase is being ported to Python/FastAPI in Parseek (Plan B).
+
+test_command:
+  - npx
+  - jest
+  - --verbose
+
+test_path: src/
+
+context_files:
+  - src/agent.ts               # Core agent loop (reference for Plan B Phase 1)
+  - src/skills/index.ts        # Skills system (reference for Plan B Phase 2)
+  - src/tools/code-agent/orchestrator.ts  # Code gen (reference for Plan B Phase 4)
+  - src/mcp-servers/gmail.ts   # Gmail integration (reference for Plan B Phase 5)
+  - README.md
+
+coding_conventions: |
+  This is the SOURCE codebase being ported to Python/Parseek.
+  When working on Vazier tasks, understand the TypeScript patterns
+  so they can be accurately ported to Python in Parseek.
+
+  Key Vazier patterns to note:
+  - Agent loop in agent.ts: study and port to agent_service.py in Parseek
+  - Tool execution: maps to tool_executor.py in PlaneAI
+  - Skills system: port to app/services/skill_service.py in Parseek
+  - MCP servers: port to app/services/*_tool_service.py in Parseek
+
+protected_files:
+  - package.json
+  - tsconfig.json
+  - .env
+
+git:
+  auto_commit: false
+  branch_prefix: planeai/

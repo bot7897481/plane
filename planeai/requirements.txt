@@ -1,0 +1,43 @@
+# PlaneAI Agent Service — Dependencies
+# Matches Parseek's Python stack exactly
+
+# Web framework
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+
+# HTTP client (for Plane API calls + Google APIs)
+httpx==0.27.2
+
+# Anthropic Claude
+anthropic==0.40.0
+
+# Async task queue (same as Parseek)
+arq==0.26.1
+
+# Redis (same as Parseek)
+redis==5.2.1
+
+# Config & validation (same as Parseek)
+pydantic==2.10.3
+pydantic-settings==2.6.1
+python-dotenv==1.0.1
+
+# YAML config parsing (.planeai.yml)
+pyyaml==6.0.2
+
+# Git operations
+gitpython==3.1.43
+
+# File watching (monitor codebase changes)
+watchdog==6.0.0
+
+# Structured logging
+structlog==24.4.0
+
+# WebSocket support (FastAPI built-in via starlette)
+websockets==14.1
+
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.24.0
+httpx==0.27.2  # for TestClient

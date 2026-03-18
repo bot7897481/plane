@@ -1,0 +1,61 @@
+# ─────────────────────────────────────────────────────────────────────
+# .planeai.yml — PlaneAI Project Configuration
+#
+# Drop this file into any coding project's root directory.
+# Rename it to .planeai.yml (remove the .example)
+# PlaneAI will auto-detect it and use these settings when
+# implementing tasks for this project.
+# ─────────────────────────────────────────────────────────────────────
+
+# Human-readable name (must match or be similar to the Plane project name)
+name: Parseek
+
+# Tech stack description — injected into Claude's system prompt
+tech_stack: >
+  Python 3.12 + FastAPI (async) + SQLAlchemy async + PostgreSQL + Redis + Qdrant.
+  Frontend: React 19 + TypeScript + Tailwind 4 + React Router v7 + TanStack Query.
+  Background jobs: arq (same API as Celery but async). Auth: Clerk.
+  Payments: Stripe. Observability: Langfuse.
+
+# How to run the test suite
+test_command:
+  - pytest
+  - -v
+  - --tb=short
+  - -x  # stop on first failure
+
+# Specific test directory (leave empty to test all)
+test_path: tests/
+
+# Files Claude should read FIRST before implementing anything
+# (gives Claude essential context about the project)
+context_files:
+  - app/main.py          # FastAPI app setup, lifespan, registered routers
+  - app/config.py        # All environment variables and settings
+  - app/models/user.py   # User model (multi-tenant base)
+  - app/services/claude_service.py  # How Anthropic API is used
+  - app/services/credit_service.py  # Credit deduction pattern
+  - CONTRIBUTING.md      # Coding conventions
+
+# Patterns Claude must follow (appended to system prompt)
+coding_conventions: |
+  - Every new model file goes in app/models/
+  - Every new service goes in app/services/
+  - Every new API route goes in app/api/ and is registered in app/main.py
+  - All database queries must filter by user_id
+  - All LLM calls must go through claude_service.py and use model_router.py
+  - All AI operations must call credit_service.deduct_credits() first
+  - Use async/await throughout — no sync database calls
+
+# Files Claude must NEVER modify
+protected_files:
+  - app/config.py        # Don't change settings structure
+  - alembic/env.py       # Don't touch migrations setup
+  - .env                 # Never touch environment files
+  - requirements.txt     # Don't add deps without noting them in the summary
+
+# Git settings
+git:
+  auto_commit: false     # Set true to auto-commit after each task
+  branch_prefix: planeai/
+  commit_message_template: "feat({issue_id}): {task_title}\n\nImplemented by PlaneAI"

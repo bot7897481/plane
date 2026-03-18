@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PlaneAI — AI-First Dev Project Management System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #16161f;
+    --border: #1e1e2e;
+    --accent: #6c63ff;
+    --accent2: #ff6b6b;
+    --accent3: #43d9ad;
+    --accent4: #f7c948;
+    --text: #e2e2f0;
+    --muted: #8888aa;
+    --plane-blue: #3b82f6;
+    --claude-orange: #d97706;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 40px 20px;
+    line-height: 1.6;
+  }
+
+  .page { max-width: 1100px; margin: 0 auto; }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #6c63ff22, #43d9ad22);
+    border: 1px solid #6c63ff44;
+    color: var(--accent3);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .header h1 {
+    font-size: 52px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #fff 0%, #6c63ff 50%, #43d9ad 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+    line-height: 1.1;
+  }
+  .header p {
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Section titles */
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Vision block */
+  .vision {
+    background: linear-gradient(135deg, #6c63ff11 0%, #43d9ad11 100%);
+    border: 1px solid #6c63ff33;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 50px;
+    position: relative;
+    overflow: hidden;
+  }
+  .vision::before {
+    content: '"';
+    position: absolute;
+    top: -20px;
+    left: 24px;
+    font-size: 120px;
+    color: #6c63ff22;
+    font-family: Georgia, serif;
+    line-height: 1;
+  }
+  .vision h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .vision p {
+    color: var(--muted);
+    font-size: 15px;
+    position: relative;
+    max-width: 800px;
+  }
+
+  /* Architecture flow */
+  .arch-container {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 50px;
+  }
+
+  .arch-layer {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .arch-layer:hover { border-color: #6c63ff55; }
+
+  .arch-layer .layer-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .arch-layer .layer-label .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+
+  .arch-boxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+  }
+
+  .arch-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    transition: all 0.2s;
+  }
+  .arch-box:hover {
+    transform: translateY(-2px);
+    border-color: #6c63ff55;
+    box-shadow: 0 8px 24px #6c63ff11;
+  }
+  .arch-box .box-icon { font-size: 22px; margin-bottom: 8px; }
+  .arch-box .box-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .arch-box .box-desc {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* Arrow connector */
+  .arrow-down {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 6px 0;
+    color: var(--muted);
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .arrow-down .arrow-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .arrow-down .line { width: 1px; height: 20px; background: #6c63ff55; }
+  .arrow-down .arrowhead { color: #6c63ff; font-size: 16px; line-height: 1; }
+
+  /* Workflow steps */
+  .workflow {
+    margin-bottom: 50px;
+  }
+  .workflow-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0;
+    position: relative;
+  }
+  .workflow-step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px 20px;
+    position: relative;
+    transition: background 0.2s;
+  }
+  .workflow-step:first-child { border-radius: 12px 0 0 12px; }
+  .workflow-step:last-child { border-radius: 0 12px 12px 0; }
+  .workflow-step:not(:last-child) { border-right: none; }
+  .workflow-step:hover { background: var(--surface2); }
+
+  .step-num {
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+  }
+  .step-icon { font-size: 24px; margin-bottom: 10px; }
+  .step-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .step-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+  .step-connector {
+    position: absolute;
+    right: -18px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 36px;
+    height: 36px;
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    font-size: 14px;
+  }
+
+  /* Plane layer colors */
+  .layer-plane { border-color: #3b82f633; }
+  .layer-plane .dot { background: var(--plane-blue); }
+  .layer-agent { border-color: #6c63ff33; }
+  .layer-agent .dot { background: var(--accent); }
+  .layer-claude { border-color: #d9770633; }
+  .layer-claude .dot { background: var(--claude-orange); }
+  .layer-project { border-color: #43d9ad33; }
+  .layer-project .dot { background: var(--accent3); }
+
+  /* Projects section */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+    margin-bottom: 50px;
+  }
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    transition: all 0.2s;
+  }
+  .project-card:hover {
+    border-color: #43d9ad44;
+    box-shadow: 0 8px 32px #43d9ad0a;
+  }
+  .project-card .proj-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+  }
+  .tag-ai { background: #6c63ff22; color: var(--accent); border: 1px solid #6c63ff44; }
+  .tag-ecom { background: #43d9ad22; color: var(--accent3); border: 1px solid #43d9ad44; }
+  .project-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .project-card p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+  .project-card .proj-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .stack-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--muted);
+  }
+
+  /* Data flow diagram */
+  .data-flow {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 50px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .data-flow pre {
+    font-size: 12px;
+    color: #aaa;
+    line-height: 1.8;
+    overflow-x: auto;
+  }
+  .data-flow pre .highlight { color: var(--accent3); }
+  .data-flow pre .accent { color: var(--accent); }
+  .data-flow pre .orange { color: var(--claude-orange); }
+  .data-flow pre .blue { color: var(--plane-blue); }
+  .data-flow pre .yellow { color: var(--accent4); }
+
+  /* Phase plan */
+  .phases {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 50px;
+  }
+  .phase {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 20px;
+    align-items: start;
+    transition: border-color 0.2s;
+  }
+  .phase:hover { border-color: #6c63ff44; }
+  .phase-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .phase-label {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 1px;
+  }
+  .phase h4 { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .phase p { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .phase .tasks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .task-chip {
+    font-size: 10px;
+    padding: 3px 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: #aaa;
+  }
+
+  .phase-1 { border-left: 3px solid var(--accent3); }
+  .phase-2 { border-left: 3px solid var(--accent); }
+  .phase-3 { border-left: 3px solid var(--claude-orange); }
+  .phase-4 { border-left: 3px solid var(--accent4); }
+
+  /* CTA */
+  .cta {
+    background: linear-gradient(135deg, #6c63ff11 0%, #43d9ad11 100%);
+    border: 1px solid #6c63ff33;
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+  }
+  .cta h2 { font-size: 28px; font-weight: 800; color: #fff; margin-bottom: 12px; }
+  .cta p { font-size: 15px; color: var(--muted); max-width: 500px; margin: 0 auto 24px; }
+  .cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-family: 'Inter', sans-serif;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="badge">🤖 AI-First Development</div>
+    <h1>PlaneAI Agent</h1>
+    <p>An autonomous AI coding agent that lives inside your project management workflow — reads tasks, writes code, runs tests, and closes issues automatically.</p>
+  </div>
+
+  <!-- Vision -->
+  <div class="vision">
+    <h2>The Vision</h2>
+    <p>An AI agent embedded in every coding project that reads the plan from <strong style="color:#3b82f6">Plane</strong>, understands the task, uses <strong style="color:#d97706">Claude</strong> to implement the code, runs the test suite, and autonomously marks tasks as complete — creating bug issues automatically when tests fail. Your projects manage themselves.</p>
+  </div>
+
+  <!-- Architecture -->
+  <div class="section-title">System Architecture</div>
+
+  <div class="arch-container">
+
+    <!-- Layer 1: PM Layer -->
+    <div class="arch-layer layer-plane">
+      <div class="layer-label"><span class="dot"></span> Layer 1 — Project Management (Plane)</div>
+      <div class="arch-boxes">
+        <div class="arch-box">
+          <div class="box-icon">📋</div>
+          <div class="box-title">Issues & Tasks</div>
+          <div class="box-desc">Epics → Stories → Tasks → Bugs. Status: To Do → In Progress → Done</div>
+        </div>
+        <div class="arch-box">
+          <div class="box-icon">🔄</div>
+          <div class="box-title">Cycles (Sprints)</div>
+          <div class="box-desc">Time-boxed sprints with burn-down charts and progress tracking</div>
+        </div>
+        <div class="arch-box">
+          <div class="box-icon">📊</div>
+          <div class="box-title">Modules</div>
+          <div class="box-desc">Feature groupings. AI agent picks from active cycle backlog</div>
+        </div>
+        <div class="arch-box">
+          <div class="box-icon">🔌</div>
+          <div class="box-title">Plane REST API</div>
+          <div class="box-desc">Full CRUD API for issues, cycles, projects — agent's data source</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <div class="arrow-line">
+        <div class="line"></div>
+        <div class="arrowhead">▼</div>
+      </div>
+      <span style="font-size:11px; color:#6c63ff88">Plane REST API calls (poll + update)</span>
+      <div class="arrow-line">
+        <div class="line"></div>
+        <div class="arrowhead">▼</div>
+      </div>
+    </div>
+
+    <!-- Layer 2: Agent Orchestrator -->
+    <div class="arch-layer layer-agent">
+      <div class="layer-label"><span class="dot"></span> Layer 2 — AI Agent Orchestrator (Python + FastAPI)</div>
+      <div class="arch-boxes">
+        <div class="arch-box">
+          <div class="box-icon">👁️</div>
+          <div class="box-title">Task Watcher</div>
+          <div class="box-desc">Polls Plane API for tasks assigned to "AI Agent". Picks by priority</div>
+        </div>
+        <div class="arch-box">
+          <div class="box-icon">🧠</div>
+          <div class="box-title">Context Builder</div>
+          <div class="box-desc">Reads codebase, builds context window: task + code structure + history</div>
+        </div>
+        <div class="arch-box">
+          <div class="box-icon">⚙️</div>
+          <div class="box-title">Code Executor</div>
+          <div class="box-desc">Sandboxed execution environment. Runs Claude's generated code safely</div>
+        </div>
+        <div class="arch-box">
+          <div class="box-icon">🧪</div>
+          <div class="box-title">Test Runner</div>
+          <div class="box-desc">Runs pytest/jest after implementation. Captures pass/fail + coverage</div>
+        </div>
+        <div class="arch-box">
+          <div class="box-icon">📝</div>
+          <div class="box-title">Result Reporter</div>
+          <div class="box-desc">Updates Plane: marks Done or creates Bug issue with stack trace</div>
+        </div>
+        <div class="arch-box">
+          <div class="box-icon">📡</div>
+          <div class="box-title">Agent Dashboard API</div>
+          <div class="box-desc">FastAPI endpoints to monitor agent runs, view logs, trigger manually</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <div class="arrow-line">
+        <div class="line"></div>
+        <div class="arrowhead">▼</div>
+      </div>
+      <span style="font-size:11px; color:#d9770688">Anthropic API (Claude with tool use)</span>
+      <div class="arrow-line">
+        <div class="line"></div>
+        <div class="arrowhead">▼</div>
+      </div>
+    </div>
+
+    <!-- Layer 3: Claude -->
+    <div class="arch-layer layer-claude">
+      <div class="layer-label"><span class="dot"></span> Layer 3 — Claude Agent (Anthropic API)</div>
+      <div class="arch-boxes">
+        <div class="arch-box">
+          <div class="box-icon">📖</div>
+          <div class="box-title">read_file</div>
+          <div class="box-desc">Claude reads any file in the project codebase</div>
+        </div>
+        <div class="arch-box">
+          <div class="box-icon">✍️</div>
+          <div class="box-title">write_file</div>
+          <div class="box-desc">Claude writes and edits code files with proper structure</div>
+        </div>
+        <div class="arch-box">
+          <div class="box-icon">💻</div>
+          <div class="box-title">run_command</div>
+          <div class="box-desc">Execute shell commands: install deps, run builds, lint code</div>
+        </div>
+        <div class="arch-box">
+          <div class="box-icon">🔍</div>
+          <div class="box-title">search_code</div>
+          <div class="box-desc">Semantic search across the codebase to find relevant patterns</div>
+        </div>
+        <div class="arch-box">
+          <div class="box-icon">🧪</div>
+          <div class="box-title">run_tests</div>
+          <div class="box-desc">Trigger test suite and receive structured pass/fail results</div>
+        </div>
+        <div class="arch-box">
+          <div class="box-icon">📊</div>
+          <div class="box-title">update_issue</div>
+          <div class="box-desc">Mark Plane issues Done, add comments, create bug issues</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <div class="arrow-line">
+        <div class="line"></div>
+        <div class="arrowhead">▼</div>
+      </div>
+      <span style="font-size:11px; color:#43d9ad88">Code changes applied to your project repos</span>
+      <div class="arrow-line">
+        <div class="line"></div>
+        <div class="arrowhead">▼</div>
+      </div>
+    </div>
+
+    <!-- Layer 4: Projects -->
+    <div class="arch-layer layer-project">
+      <div class="layer-label"><span class="dot"></span> Layer 4 — Your Coding Projects</div>
+      <div class="arch-boxes">
+        <div class="arch-box">
+          <div class="box-icon">🤖</div>
+          <div class="box-title">InstructorAssess AI</div>
+          <div class="box-desc">AI assessment + training doc generator. First project to integrate with PlaneAI</div>
+        </div>
+        <div class="arch-box">
+          <div class="box-icon">🛒</div>
+          <div class="box-title">Project 2</div>
+          <div class="box-desc">Your second coding project — PlaneAI plugs into any codebase via config</div>
+        </div>
+        <div class="arch-box">
+          <div class="box-icon">➕</div>
+          <div class="box-title">Any Future Project</div>
+          <div class="box-desc">Add a .planeai.yml config to any repo to enable AI agent integration</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Workflow -->
+  <div class="section-title">Autonomous Agent Workflow</div>
+  <div class="workflow">
+    <div class="workflow-grid">
+      <div class="workflow-step">
+        <div class="step-num">STEP 01</div>
+        <div class="step-icon">📋</div>
+        <div class="step-title">Read Plan</div>
+        <div class="step-desc">Agent polls Plane API for tasks assigned to "AI Agent" in the active cycle. Picks highest priority.</div>
+        <div class="step-connector">→</div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">STEP 02</div>
+        <div class="step-icon">🧠</div>
+        <div class="step-title">Understand</div>
+        <div class="step-desc">Marks issue "In Progress". Builds context: task description, acceptance criteria, relevant code.</div>
+        <div class="step-connector">→</div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">STEP 03</div>
+        <div class="step-icon">💻</div>
+        <div class="step-title">Implement</div>
+        <div class="step-desc">Claude writes the code using tools: reads files, writes changes, follows existing patterns.</div>
+        <div class="step-connector">→</div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">STEP 04</div>
+        <div class="step-icon">🧪</div>
+        <div class="step-title">Test</div>
+        <div class="step-desc">Runs the full test suite automatically. Checks coverage. Validates against acceptance criteria.</div>
+        <div class="step-connector">→</div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">STEP 05</div>
+        <div class="step-icon">✅</div>
+        <div class="step-title">Report Back</div>
+        <div class="step-desc">PASS → marks Done in Plane + adds implementation note. FAIL → creates Bug issue with full stack trace.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data flow code -->
+  <div class="section-title">Data Flow (Code View)</div>
+  <div class="data-flow">
+    <pre>
+<span class="blue">┌─ PLANE PM TOOL ────────────────────────────────────────────────────────────┐</span>
+<span class="blue">│  Projects → Epics → Stories → Tasks/Bugs  │  Status: ToDo→InProgress→Done │</span>
+<span class="blue">└───────────────────────────────┬────────────────────────────────────────────┘</span>
+                                <span class="accent">│  GET /api/v1/issues/?assignee=ai-agent&status=pending</span>
+                                <span class="accent">▼</span>
+<span class="accent">┌─ PLANEAI AGENT SERVICE (FastAPI) ──────────────────────────────────────────┐</span>
+<span class="accent">│                                                                             │</span>
+<span class="accent">│  task_watcher.py  →  context_builder.py  →  agent_runner.py               │</span>
+<span class="accent">│       │                    │                       │                        │</span>
+<span class="accent">│  Poll Plane API     Read codebase files     Call Claude API                │</span>
+<span class="accent">│  Pick next task     Build prompt context    with tool_use=True             │</span>
+<span class="accent">│                                                                             │</span>
+<span class="accent">└───────────────────────────────┬────────────────────────────────────────────┘</span>
+                                <span class="orange">│  anthropic.messages.create(tools=[...], model="claude-opus-4-6")</span>
+                                <span class="orange">▼</span>
+<span class="orange">┌─ CLAUDE AGENT ─────────────────────────────────────────────────────────────┐</span>
+<span class="orange">│                                                                             │</span>
+<span class="orange">│  System: "You are a coding agent. Read the task, implement it, test it."  │</span>
+<span class="orange">│                                                                             │</span>
+<span class="orange">│  Tools available:                                                           │</span>
+<span class="orange">│    read_file(path)         → reads any project file                        │</span>
+<span class="orange">│    write_file(path, code)  → creates/edits code files                      │</span>
+<span class="orange">│    run_command(cmd)        → executes shell commands                        │</span>
+<span class="orange">│    search_code(query)      → finds relevant code patterns                  │</span>
+<span class="orange">│    run_tests()             → runs test suite, returns results               │</span>
+<span class="orange">│    update_plane_issue(id)  → marks Done or creates Bug                     │</span>
+<span class="orange">│                                                                             │</span>
+<span class="orange">└───────────────────────────────┬────────────────────────────────────────────┘</span>
+                                <span class="highlight">│</span>
+              <span class="highlight">┌─────────────────┴──────────────────────┐</span>
+              <span class="highlight">▼  TESTS PASS                           ▼  TESTS FAIL</span>
+<span class="highlight">  PATCH /issues/{id}/  status=Done        POST /issues/  type=Bug</span>
+<span class="highlight">  + Add comment with implementation       + Stack trace + reproduction steps</span>
+<span class="highlight">  + Link to git commit                    + Link to failed test output</span>
+    </pre>
+  </div>
+
+  <!-- Build Phases -->
+  <div class="section-title">Build Plan — 4 Phases</div>
+  <div class="phases">
+    <div class="phase phase-1">
+      <div>
+        <div class="phase-num">Phase 1</div>
+        <div class="phase-label">Foundation</div>
+      </div>
+      <div>
+        <h4>PlaneAI Agent Service — Core</h4>
+        <p>Set up the Python FastAPI service with Plane API integration. Build the task poller, context builder, and result reporter. Connect to your Plane instance.</p>
+        <div class="tasks">
+          <span class="task-chip">FastAPI scaffold</span>
+          <span class="task-chip">Plane API client</span>
+          <span class="task-chip">Task poller</span>
+          <span class="task-chip">Result reporter</span>
+          <span class="task-chip">Config system</span>
+        </div>
+      </div>
+    </div>
+    <div class="phase phase-2">
+      <div>
+        <div class="phase-num">Phase 2</div>
+        <div class="phase-label">Claude Agent</div>
+      </div>
+      <div>
+        <h4>Claude Agent with Tool Use</h4>
+        <p>Build the Claude agent orchestrator with all coding tools: file I/O, shell execution, code search, test running. Implement the full agentic loop.</p>
+        <div class="tasks">
+          <span class="task-chip">Anthropic SDK</span>
+          <span class="task-chip">Tool definitions</span>
+          <span class="task-chip">Agentic loop</span>
+          <span class="task-chip">Sandboxed execution</span>
+          <span class="task-chip">Test runner</span>
+        </div>
+      </div>
+    </div>
+    <div class="phase phase-3">
+      <div>
+        <div class="phase-num">Phase 3</div>
+        <div class="phase-label">Integration</div>
+      </div>
+      <div>
+        <h4>Project Integration + InstructorAssess</h4>
+        <p>Create the .planeai.yml project config format. Integrate with InstructorAssess AI as the first test project. Run end-to-end test of full loop.</p>
+        <div class="tasks">
+          <span class="task-chip">.planeai.yml config</span>
+          <span class="task-chip">InstructorAssess integration</span>
+          <span class="task-chip">End-to-end test</span>
+          <span class="task-chip">Bug detection loop</span>
+        </div>
+      </div>
+    </div>
+    <div class="phase phase-4">
+      <div>
+        <div class="phase-num">Phase 4</div>
+        <div class="phase-label">Dashboard</div>
+      </div>
+      <div>
+        <h4>Agent Monitoring Dashboard</h4>
+        <p>Build a real-time dashboard to monitor agent runs, view implementation logs, see test results, and manually trigger or override the AI agent.</p>
+        <div class="tasks">
+          <span class="task-chip">Agent activity feed</span>
+          <span class="task-chip">Run history</span>
+          <span class="task-chip">Manual trigger</span>
+          <span class="task-chip">Log viewer</span>
+          <span class="task-chip">Metrics</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Your Projects -->
+  <div class="section-title">Your Projects — Integration Targets</div>
+  <div class="projects-grid">
+    <div class="project-card">
+      <span class="proj-tag tag-ai">AI Platform</span>
+      <h3>InstructorAssess AI</h3>
+      <p>An AI-powered assessment and training document generator. This PDF training manual was created by InstructorAssess — it's the first project PlaneAI will integrate with and autonomously develop.</p>
+      <div class="proj-stack">
+        <span class="stack-tag">Python</span>
+        <span class="stack-tag">FastAPI</span>
+        <span class="stack-tag">Claude API</span>
+        <span class="stack-tag">PDF generation</span>
+        <span class="stack-tag">RAG</span>
+      </div>
+    </div>
+    <div class="project-card">
+      <span class="proj-tag tag-ecom">Project 2</span>
+      <h3>Your Second Project</h3>
+      <p>Share your second project's plan or repo and PlaneAI will integrate with it too. Any project with a .planeai.yml config file can be autonomously developed by the AI agent.</p>
+      <div class="proj-stack">
+        <span class="stack-tag">To be configured</span>
+        <span class="stack-tag">.planeai.yml</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">
+    <h2>Ready to Build PlaneAI?</h2>
+    <p>Starting with Phase 1: the Python FastAPI service that integrates with your Plane instance via its REST API.</p>
+    <div class="cta-buttons">
+      <button class="btn btn-primary">🚀 Start Building Now</button>
+      <button class="btn btn-secondary">📋 Review Architecture First</button>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

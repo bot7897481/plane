@@ -1,0 +1,88 @@
+# .planeai.yml for Parseek
+# Drop this at the root of your Parseek repo as: .planeai.yml
+
+name: Parseek
+
+tech_stack: >
+  Python 3.12 + FastAPI (fully async) + SQLAlchemy 2.0 async + PostgreSQL + pgvector.
+  Redis for caching and arq job queue. Qdrant for vector search.
+  Frontend: React 19 + TypeScript + Tailwind 4 + React Router v7 + TanStack Query + axios.
+  Auth: Clerk (JWT validation middleware). Payments: Stripe.
+  LLM: Anthropic Claude via claude_service.py + model_router.py.
+  Observability: Langfuse tracing on every LLM call.
+  Background jobs: arq (async). Embeddings: Voyage AI (1024-dim).
+
+test_command:
+  - pytest
+  - -v
+  - --tb=short
+  - -x
+
+test_path: tests/
+
+context_files:
+  - app/main.py
+  - app/config.py
+  - app/models/user.py
+  - app/models/document.py          # Example model to follow patterns from
+  - app/services/claude_service.py
+  - app/services/credit_service.py
+  - app/services/model_router.py
+  - app/api/documents.py            # Example API route to follow patterns from
+
+coding_conventions: |
+  ALWAYS follow these Parseek patterns:
+
+  1. Models (app/models/new_thing.py):
+     - UUID primary key: server_default=func.gen_random_uuid()
+     - Always has user_id FK to users with cascade delete
+     - created_at: DateTime(timezone=True) server_default=func.now()
+     - updated_at: auto-update on change
+     - Follow app/models/document.py exactly
+
+  2. Services (app/services/new_thing_service.py):
+     - All methods are async
+     - First param is always db: AsyncSession
+     - Always filter by user_id — never leak data between users
+     - AI operations: call credit_service.deduct_credits() FIRST
+     - All LLM calls through claude_service.py + model_router.py
+     - Add Langfuse trace for every LLM call
+
+  3. API Routes (app/api/new_thing.py):
+     - Use get_current_user from app/auth.py for auth
+     - Register router in app/main.py
+     - Return Pydantic response models (never raw dicts)
+     - Follow app/api/documents.py exactly
+
+  4. Frontend (frontend-react/src/):
+     - API functions in src/api/new_thing.ts
+     - Pages in src/pages/NewThingPage.tsx
+     - Components in src/components/new-thing/
+     - Register routes in App.tsx
+     - Follow src/pages/WorkspacePage.tsx patterns
+
+  5. Background jobs:
+     - Add to app/worker.py following existing job patterns
+     - Use arq not celery
+
+  6. The Plan B tasks come in this order (implement in sequence):
+     Phase 1: Agent session models → Agent service → WebSocket API → Frontend chat
+     Phase 2: Skills system
+     Phase 3: Long-term memory (Mem0 patterns + pgvector)
+     Phase 4: Code generation agent (Planner → Writer → Tester → Fixer)
+     Phase 5: Gmail + Calendar + Drive
+     Phase 6: Telegram bot
+     Phase 7: Daily briefing
+
+protected_files:
+  - app/config.py
+  - app/auth.py
+  - alembic/env.py
+  - .env
+  - requirements.txt
+  - frontend-react/package.json
+
+git:
+  auto_commit: false
+  branch_prefix: planeai/
+  commit_message_template: "feat({issue_id}): {task_title}\n\nImplemented by PlaneAI (Claude)\nTask: {plane_url}"

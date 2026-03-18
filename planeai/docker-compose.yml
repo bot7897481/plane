@@ -1,0 +1,40 @@
+# PlaneAI — Docker Compose
+# Runs PlaneAI alongside your existing Plane instance.
+# Make sure Plane is already running before starting PlaneAI.
+
+version: "3.9"
+
+services:
+
+  planeai:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "9000:9000"
+    env_file:
+      - .env
+    volumes:
+      # Mount your projects directory so PlaneAI can read/write code
+      - ${PROJECTS_ROOT}:${PROJECTS_ROOT}:rw
+      # Mount Plane's network so PlaneAI can reach it
+    depends_on:
+      - redis-planeai
+    restart: unless-stopped
+    networks:
+      - planeai-net
+      # If Plane runs in Docker, add its network here:
+      # - plane-default  (or whatever Plane's network is called)
+
+  redis-planeai:
+    image: redis:7-alpine
+    # Use a different port from Plane's Redis if on the same host
+    ports:
+      - "6380:6379"
+    restart: unless-stopped
+    networks:
+      - planeai-net
+
+networks:
+  planeai-net:
+    driver: bridge
