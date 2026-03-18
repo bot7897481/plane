@@ -11,7 +11,7 @@ FROM artifacts.plane.so/makeplane/plane-backend:${PLANE_VERSION} AS backend-img
 FROM artifacts.plane.so/makeplane/plane-space:${PLANE_VERSION} AS space-img
 FROM artifacts.plane.so/makeplane/plane-admin:${PLANE_VERSION} AS admin-img
 FROM artifacts.plane.so/makeplane/plane-live:${PLANE_VERSION} AS live-img
-FROM artifacts.plane.so/makeplane/plane-proxy:${PLANE_VERSION} AS proxy-img
+# proxy-img not used — caddy installed via apk instead (proxy image ships nginx, not caddy)
 
 # **************************************************
 #  STAGE 1: Runner
@@ -38,7 +38,7 @@ COPY --from=live-img /app /app/live
 
 RUN rm -rf /app/space/apps/space/.next/cache
 
-COPY --from=proxy-img /usr/bin/caddy /usr/bin/caddy
+RUN apk add --no-cache caddy
 COPY dist/Caddyfile /app/proxy/Caddyfile
 
 COPY --from=backend-img /code /app/backend
