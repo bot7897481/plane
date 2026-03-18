@@ -31,12 +31,10 @@ COPY --from=node /usr/local/lib /usr/local/lib
 COPY --from=node /usr/local/include /usr/local/include
 COPY --from=node /usr/local/bin /usr/local/bin
 
-COPY --from=web-img /usr/share/nginx/html /app/web
-COPY --from=space-img /app /app/space
-COPY --from=admin-img /usr/share/nginx/html/god-mode /app/admin
-COPY --from=live-img /app /app/live
-
-RUN rm -rf /app/space/apps/space/.next/cache
+COPY --from=web-img /app/web /app/web
+COPY --from=space-img /app/space /app/space
+COPY --from=admin-img /app/admin /app/admin
+COPY --from=live-img /app/live /app/live
 
 RUN apk add --no-cache caddy
 COPY dist/Caddyfile /app/proxy/Caddyfile
