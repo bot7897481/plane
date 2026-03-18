@@ -16,6 +16,7 @@ out/
 **/out/
 dist/
 **/dist/
+!deployments/aio/community/dist/
 # Logs
 npm-debug.log*
 pnpm-debug.log*
